@@ -8,7 +8,8 @@ before:
     - go test ./...
 
 builds:
-  - id: sshkm
+  # Лёгкий вход: version без импорта Cobra (обходит зависание до main()).
+  - id: sshkm-launcher
     main: ./cmd/sshkm
     binary: sshkm
     env:
@@ -20,7 +21,24 @@ builds:
       - amd64
       - arm64
     ldflags:
-      - -s -w -X github.com/RTHeLL/ssh-keys-manager/internal/cli.version={{.Version}} -X github.com/RTHeLL/ssh-keys-manager/internal/cli.commit={{.Commit}} -X github.com/RTHeLL/ssh-keys-manager/internal/cli.date={{.Date}}
+      - -s -w -X github.com/RTHeLL/ssh-keys-manager/internal/buildinfo.Version={{.Version}} -X github.com/RTHeLL/ssh-keys-manager/internal/buildinfo.Commit={{.Commit}} -X github.com/RTHeLL/ssh-keys-manager/internal/buildinfo.Date={{.Date}}
+  - id: sshkm-core
+    main: ./cmd/sshkmcore
+    binary: sshkmcore
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X github.com/RTHeLL/ssh-keys-manager/internal/buildinfo.Version={{.Version}} -X github.com/RTHeLL/ssh-keys-manager/internal/buildinfo.Commit={{.Commit}} -X github.com/RTHeLL/ssh-keys-manager/internal/buildinfo.Date={{.Date}}
+    overrides:
+      - goos: darwin
+        ldflags:
+          - -s -w -X github.com/RTHeLL/ssh-keys-manager/internal/buildinfo.Version={{.Version}} -X github.com/RTHeLL/ssh-keys-manager/internal/buildinfo.Commit={{.Commit}} -X github.com/RTHeLL/ssh-keys-manager/internal/buildinfo.Date={{.Date}} -linkmode=external
 
 archives:
   - id: default

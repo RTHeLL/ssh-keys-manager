@@ -2,3 +2,8 @@
 .gocache/
 .gomodcache/
 dist/
+# Только бинарники в корне репозитория (не каталог cmd/sshkmcore).
+/sshkm
+/sshkmcore
+/sshkm.tmp
+/sshkmcore.tmp
