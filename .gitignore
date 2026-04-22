@@ -1,0 +1,4 @@
+.gopath/
+.gocache/
+.gomodcache/
+dist/

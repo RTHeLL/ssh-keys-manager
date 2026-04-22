@@ -1,0 +1,69 @@
+version: 2
+
+project_name: sshkm
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: sshkm
+    main: ./cmd/sshkm
+    binary: sshkm
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X github.com/RTHeLL/ssh-keys-manager/internal/cli.version={{.Version}} -X github.com/RTHeLL/ssh-keys-manager/internal/cli.commit={{.Commit}} -X github.com/RTHeLL/ssh-keys-manager/internal/cli.date={{.Date}}
+
+archives:
+  - id: default
+    formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE*
+      - README.md
+
+checksum:
+  name_template: "checksums.txt"
+
+brews:
+  - name: sshkm
+    repository:
+      owner: RTHeLL
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: sshkm-bot
+      email: bot@users.noreply.github.com
+    homepage: "https://github.com/RTHeLL/ssh-keys-manager"
+    description: "Professional SSH keys manager for terminal workflows"
+    license: "MIT"
+    test: |
+      system "#{bin}/sshkm", "version"
+
+nfpms:
+  - id: deb
+    package_name: sshkm
+    file_name_template: "{{ .ConventionalFileName }}"
+    vendor: RTHeLL
+    homepage: "https://github.com/RTHeLL/ssh-keys-manager"
+    maintainer: "kinder <maintainer@example.com>"
+    description: "Professional SSH keys manager for terminal workflows"
+    license: "MIT"
+    formats:
+      - deb
+    bindir: /usr/bin
+    section: utils
+    priority: optional
+
+release:
+  github:
+    owner: RTHeLL
+    name: ssh-keys-manager
